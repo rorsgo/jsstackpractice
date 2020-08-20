@@ -6,6 +6,13 @@ server.use(express.json());
 
 const users = ["UserOne", "UserTwo", "UserThree"];
 
+server.use((request, response, next) => {
+  console.time("Request");
+  console.log(`Method: ${request.method} | URL: ${request.url}`)
+  next();
+  console.timeEnd("Request");
+});
+
 server.get("/users/:index", (request, response) => {
   const { index } = request.params;
   return response.json(users[index]);
