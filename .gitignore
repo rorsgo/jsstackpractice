@@ -1,5 +1,2 @@
 # vscode tools
 .vscode/launch.json
-
-# nodemon config
-backend/nodemon.json
