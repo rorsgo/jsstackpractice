@@ -1,8 +1,19 @@
 import jwt from "jsonwebtoken";
+import * as Yup from "yup";
+
 import User from "../models/User";
 
 class SessionController {
   async store(request, response) {
+    const scheme = Yup.object().shape({
+      email: Yup.string().email().required(),
+      password: Yup.string().required()
+    });
+
+    if(!(await scheme.isValid(request.body))){
+      return response.status(400).json({ error: "Fields not valid" });
+    }
+    
     const { email, password } = request.body;
     const user = await User.findOne({ where: { email } });
 
