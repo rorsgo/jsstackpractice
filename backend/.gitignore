@@ -6,3 +6,8 @@ nodemon.json
 
 # enviroment variables
 .env
+
+# uploaded images
+/tmp/uploads/*.jpg
+/tmp/uploads/*.jpeg
+/tmp/uploads/*.png
