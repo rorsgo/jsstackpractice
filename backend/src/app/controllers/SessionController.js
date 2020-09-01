@@ -5,12 +5,12 @@ import User from "../models/User";
 
 class SessionController {
   async store(request, response) {
-    const scheme = Yup.object().shape({
+    const schema = Yup.object().shape({
       email: Yup.string().email().required(),
       password: Yup.string().required()
     });
 
-    if(!(await scheme.isValid(request.body))){
+    if(!(await schema.isValid(request.body))){
       return response.status(400).json({ error: "Fields not valid" });
     }
     
