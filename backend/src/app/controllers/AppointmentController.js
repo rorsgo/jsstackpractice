@@ -7,10 +7,13 @@ import * as Yup from "yup";
 
 class AppointmentController {
   async index(request, response){
+    const { page = 1 } = request.query;
     const appointments = await Appointment.findAll({
       where: { user_id: request.userId },
       order: ["date"],
       attributes: ["id", "date", "canceled_at"],
+      limit: 20,
+      offset: (page - 1) * 20,
       include: [{
         model: User,
         as: "provider",
