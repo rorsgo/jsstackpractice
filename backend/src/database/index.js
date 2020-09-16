@@ -1,4 +1,5 @@
 import Sequelize from "sequelize";
+import mongodb from "mongodb";
 
 import databaseConfig from "../config/database";
 
@@ -11,6 +12,7 @@ const models = [User, File, Appointment];
 class Database {
   constructor() {
     this.init();
+    this.mongo();
   }
 
   init() {
@@ -18,6 +20,16 @@ class Database {
     models
     .map(model => model.init(this.connection))
     .map(model => model.associate && model.associate(this.connection.models));
+  }
+
+  mongo(){
+    this.mongoConnection = mongodb.connect(
+      process.env.MONGODB_CONNECTION,
+      {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      }
+    );
   }
 }
 
