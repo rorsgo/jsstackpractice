@@ -9,12 +9,14 @@ import SessionController from "./app/controllers/SessionController";
 import FileController from "./app/controllers/FileController";
 import ProviderController from "./app/controllers/ProviderController";
 import AppointmentController from "./app/controllers/AppointmentController";
+import ScheduleController from "./app/controllers/ScheduleController";
 
 const routes = new Router();
 const uploads = multer(multerConfig);
 
 routes.get("/providers", authMiddleware, ProviderController.index);
 routes.get("/appointments", authMiddleware, AppointmentController.index);
+routes.get("/schedules", authMiddleware, ScheduleController.index);
 
 routes.post("/users", UserController.store);
 routes.post("/sessions", SessionController.store);
