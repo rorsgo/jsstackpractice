@@ -1,12 +1,13 @@
 import Appointment from "../models/Appointment";
 import User from "../models/User";
 import File from "../models/File";
+import Notification from "../schemas/Notification";
 
-import { isBefore, parseISO, startOfHour } from "date-fns";
+import { isBefore, parseISO, startOfHour, format } from "date-fns";
 import * as Yup from "yup";
 
 class AppointmentController {
-  async index(request, response){
+  async index(request, response) {
     const { page = 1 } = request.query;
     const appointments = await Appointment.findAll({
       where: { user_id: request.userId, canceled_at: null },
@@ -27,14 +28,14 @@ class AppointmentController {
     });
     return response.json(appointments);
   }
-  
+
   async store(request, response) {
     const schema = Yup.object().shape({
       provider_id: Yup.number().required(),
       date: Yup.date().required()
     });
 
-    if(!(await schema.isValid(request.body))){
+    if (!(await schema.isValid(request.body))) {
       return response.status(400).json({ error: "Fields not valid." });
     }
 
@@ -43,14 +44,14 @@ class AppointmentController {
       where: { id: provider_id, provider: true }
     });
 
-    if(!isProvider){
-      return response.status(401).json({ error: "You can only create appointments with providers."});
+    if (!isProvider) {
+      return response.status(401).json({ error: "You can only create appointments with providers." });
     }
 
     const hourStart = startOfHour(parseISO(date));
 
-    if(isBefore(hourStart, new Date())){
-      return response.status(400).json({ error: "Past dates are not allowed."});
+    if (isBefore(hourStart, new Date())) {
+      return response.status(400).json({ error: "Past dates are not allowed." });
     }
 
     const checkAvailability = await Appointment.findOne({
@@ -61,14 +62,29 @@ class AppointmentController {
       }
     });
 
-    if(checkAvailability){
-      return response.status(400).json({ error: "Appointment date is not available."});
+    if (checkAvailability) {
+      return response.status(400).json({ error: "Appointment date is not available." });
     }
-    
+
     const appointment = await Appointment.create({
       user_id: request.userId,
       provider_id,
       date
+    });
+
+    const user = await User.findByPk(request.userId);
+    const formattedDate = format(
+      hourStart,
+      "EEEE, HH:mm - dd MMMM, yyyy.",
+      {
+        useAdditionalDayOfYearTokens: true,
+        useAdditionalWeekYearTokens: true
+      }
+    );
+
+    await Notification.create({
+      content: `New appointment of the client ${user.name} on ${formattedDate}`,
+      user: provider_id
     });
 
     return response.json(appointment);
