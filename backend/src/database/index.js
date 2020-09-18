@@ -1,5 +1,5 @@
 import Sequelize from "sequelize";
-import mongodb from "mongodb";
+import mongoose from "mongoose";
 
 import databaseConfig from "../config/database";
 
@@ -23,11 +23,12 @@ class Database {
   }
 
   mongo(){
-    this.mongoConnection = mongodb.connect(
+    this.mongoConnection = mongoose.connect(
       process.env.MONGODB_CONNECTION,
       {
+        useFindAndModify: true,
         useNewUrlParser: true,
-        useUnifiedTopology: true,
+        useUnifiedTopology: true
       }
     );
   }
