@@ -49,21 +49,25 @@ class AppointmentController {
     }
 
     const hourStart = startOfHour(parseISO(date));
-
+    
     if (isBefore(hourStart, new Date())) {
       return response.status(400).json({ error: "Past dates are not allowed." });
     }
-
+    
     const checkAvailability = await Appointment.findOne({
       where: {
         provider_id,
         canceled_at: null,
-        date: hourStart
+        date
       }
     });
 
     if (checkAvailability) {
-      return response.status(400).json({ error: "Appointment date is not available." });
+      return response.status(401).json({ error: "Appointment date is not available." });
+    }
+
+    if (request.userId === provider_id) {
+      return response.status(401).json({ error: "Providers can not create self-appointment."});
     }
 
     const appointment = await Appointment.create({
