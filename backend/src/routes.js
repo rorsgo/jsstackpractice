@@ -24,6 +24,7 @@ routes.post("/users", UserController.store);
 routes.post("/sessions", SessionController.store);
 routes.post("/files", authMiddleware, uploads.single("file"), FileController.store);
 routes.post("/appointments", authMiddleware, AppointmentController.store);
+routes.delete("/appointments/:id", authMiddleware, AppointmentController.delete);
 
 routes.put("/users", authMiddleware, UserController.update);
 routes.put("/notification/:id", authMiddleware, NotificationController.update);

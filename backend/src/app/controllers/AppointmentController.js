@@ -3,7 +3,7 @@ import User from "../models/User";
 import File from "../models/File";
 import Notification from "../schemas/Notification";
 
-import { isBefore, parseISO, startOfHour, format } from "date-fns";
+import { isBefore, parseISO, startOfHour, format, subHours } from "date-fns";
 import * as Yup from "yup";
 
 class AppointmentController {
@@ -49,11 +49,11 @@ class AppointmentController {
     }
 
     const hourStart = startOfHour(parseISO(date));
-    
+
     if (isBefore(hourStart, new Date())) {
       return response.status(400).json({ error: "Past dates are not allowed." });
     }
-    
+
     const checkAvailability = await Appointment.findOne({
       where: {
         provider_id,
@@ -67,7 +67,7 @@ class AppointmentController {
     }
 
     if (request.userId === provider_id) {
-      return response.status(401).json({ error: "Providers can not create self-appointment."});
+      return response.status(401).json({ error: "Providers can not create self-appointment." });
     }
 
     const appointment = await Appointment.create({
@@ -90,6 +90,26 @@ class AppointmentController {
       content: `New appointment of the client ${user.name} on ${formattedDate}`,
       user: provider_id
     });
+
+    return response.json(appointment);
+  }
+
+  async delete(request, response) {
+    const appointment = await Appointment.findByPk(request.params.id);
+
+    if (appointment.user_id !== request.userId) {
+      return response.status(401).json({ error: "You can only cancel your appoinments." });
+    }
+
+    const cancelationDateLimit = subHours(appointment.date, 2);
+
+    if (isBefore(cancelationDateLimit, new Date())) {
+      return response.status(401).json({ error: "You can only cancel appointments 2 hours in advance."});
+    }
+
+    appointment.canceled_at = new Date();
+
+    await appointment.save();
 
     return response.json(appointment);
   }
