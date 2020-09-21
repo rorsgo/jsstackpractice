@@ -2,6 +2,7 @@ import Appointment from "../models/Appointment";
 import User from "../models/User";
 import File from "../models/File";
 import Notification from "../schemas/Notification";
+import Mailer from "../../lib/Mailer";
 
 import { isBefore, parseISO, startOfHour, format, subHours } from "date-fns";
 import * as Yup from "yup";
@@ -95,7 +96,15 @@ class AppointmentController {
   }
 
   async delete(request, response) {
-    const appointment = await Appointment.findByPk(request.params.id);
+    const appointment = await Appointment.findByPk(request.params.id, {
+      include: [
+        {
+          model: User,
+          as: "provider",
+          attributes: ["name", "email"]
+        }
+      ]
+    });
 
     if (appointment.user_id !== request.userId) {
       return response.status(401).json({ error: "You can only cancel your appoinments." });
@@ -104,12 +113,18 @@ class AppointmentController {
     const cancelationDateLimit = subHours(appointment.date, 2);
 
     if (isBefore(cancelationDateLimit, new Date())) {
-      return response.status(401).json({ error: "You can only cancel appointments 2 hours in advance."});
+      return response.status(401).json({ error: "You can only cancel appointments 2 hours in advance." });
     }
 
     appointment.canceled_at = new Date();
 
     await appointment.save();
+
+    await Mailer.sendMail({
+      to: `${appointment.provider.name} <${appointment.provider.email}>`,
+      subject: "Canceled Appointment",
+      text: "You have a new appointment canceled."
+    });
 
     return response.json(appointment);
   }
