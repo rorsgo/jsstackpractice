@@ -59,7 +59,7 @@ class AppointmentController {
       where: {
         provider_id,
         canceled_at: null,
-        date
+        date: hourStart
       }
     });
 
@@ -74,7 +74,7 @@ class AppointmentController {
     const appointment = await Appointment.create({
       user_id: request.userId,
       provider_id,
-      date
+      date: hourStart
     });
 
     const user = await User.findByPk(request.userId);
