@@ -1,11 +1,13 @@
+import { isBefore, parseISO, startOfHour, format, subHours } from "date-fns";
+import * as Yup from "yup";
+
 import Appointment from "../models/Appointment";
 import User from "../models/User";
 import File from "../models/File";
-import Notification from "../schemas/Notification";
-import Mailer from "../../lib/Mailer";
 
-import { isBefore, parseISO, startOfHour, format, subHours } from "date-fns";
-import * as Yup from "yup";
+import Notification from "../schemas/Notification";
+import CancellationMail from "../jobs/CancellationMail";
+import Queue from "../../lib/Queue";
 
 class AppointmentController {
   async index(request, response) {
@@ -125,22 +127,8 @@ class AppointmentController {
 
     await appointment.save();
 
-    await Mailer.sendMail({
-      to: `${appointment.provider.name} <${appointment.provider.email}>`,
-      subject: "Canceled Appointment",
-      template: "cancellation",
-      context: {
-        provider: appointment.provider.name,
-        user: appointment.user.name,
-        date: format(
-          appointment.date,
-          "EEEE, dd MMMM yyyy - HH:mm",
-          {
-            useAdditionalDayOfYearTokens: true,
-            useAdditionalWeekYearTokens: true
-          }
-        )
-      }
+    Queue.add(CancellationMail.key, {
+      appointment
     });
 
     return response.json(appointment);
