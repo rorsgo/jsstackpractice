@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
 import { FaGithubAlt, FaPlus, FaSpinner } from "react-icons/fa";
-import { Container, Form, SubmitButton } from "./styles";
+import { Container, Form, SubmitButton, List } from "./styles";
 
 import api from "../../services/api";
 
@@ -11,6 +11,24 @@ class Main extends Component {
     repositories: [],
     loading: false
   };
+
+  componentDidMount = () => {
+    const repositories = JSON.parse(localStorage.getItem('repositories'));
+
+    if (repositories) {
+      this.setState({
+        repositories: repositories
+      })
+    }
+  }
+
+  componentDidUpdate = (_, prevState) => {
+    const { repositories } = this.state;
+
+    if (prevState.repositories !== repositories) {
+      localStorage.setItem("repositories", JSON.stringify(repositories));
+    }
+  }
 
   handleChange = event => {
     const { name, value } = event.target;
@@ -26,7 +44,7 @@ class Main extends Component {
       loading: true
     });
 
-    const { newRepository, repositories, loading } = this.state;
+    const { newRepository, repositories } = this.state;
     const response = await api.get(`/repos/${newRepository}`);
     const repositoryData = {
       name: response.data.full_name,
@@ -40,7 +58,7 @@ class Main extends Component {
   }
 
   render() {
-    const { newRepository, loading } = this.state;
+    const { newRepository, repositories, loading } = this.state;
 
     return (
       <Container>
@@ -59,18 +77,26 @@ class Main extends Component {
           />
 
           <SubmitButton loading={loading}>
-            {loading ?
+            {loading ? (
               <FaSpinner
                 color="#FFF"
                 size={14}
-              /> :
-              <FaPlus
-                color="#FFF"
-                size={14}
-              />
+              />) : (
+                <FaPlus
+                  color="#FFF"
+                  size={14}
+                />)
             }
           </SubmitButton>
         </Form>
+        <List>
+          {repositories.map(repository => (
+            <li key={repository.name}>
+              <span>{repository.name}</span>
+              <a href="">Details</a>
+            </li>
+          ))}
+        </List>
       </Container>
     )
   }
