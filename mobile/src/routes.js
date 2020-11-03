@@ -15,11 +15,8 @@ export default function Routes() {
           name="Main"
           component={Main}
           options={{
-            title: "My home",
+            title: "Users",
             headerTitleAlign: "center",
-            headerTitleStyle: {
-              marginBottom: 20
-            },
             headerStyle: {
               backgroundColor: "#7159c1"
             },
@@ -30,6 +27,14 @@ export default function Routes() {
         <Stack.Screen
           name="User"
           component={User}
+          options={{
+            title: "Starred Repositories",
+            headerTitleAlign: "center",
+            headerStyle: {
+              backgroundColor: "#7159c1"
+            },
+            headerTintColor: "#FFF",
+          }}
         />
       </Stack.Navigator>
     </NavigationContainer>
