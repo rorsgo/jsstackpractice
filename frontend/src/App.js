@@ -10,9 +10,9 @@ const App = () => {
   return (
     <>
       <BrowserRouter>
+        <Header />
         <GlobalStyle />
         <Routes />
-        <Header />
       </BrowserRouter>
     </>
   )
