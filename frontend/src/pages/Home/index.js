@@ -16,7 +16,7 @@ class Home extends Component {
 
     const data = response.data.map(product => ({
       ...product,
-      priceFormatted: formatPrice(product.price)
+      formattedPrice: formatPrice(product.price)
     }));
 
     this.setState({ products: data });
@@ -43,7 +43,7 @@ class Home extends Component {
               alt={product.title}
             />
             <strong>{product.title}</strong>
-            <span>{product.priceFormatted}</span>
+            <span>{product.formattedPrice}</span>
             <button
               type="button"
               onClick={() => this.handleAddProduct(product)}
