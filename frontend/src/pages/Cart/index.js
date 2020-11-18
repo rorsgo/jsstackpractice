@@ -3,10 +3,11 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
 import * as CartActions from "../../store/modules/cart/actions";
+import { formatPrice } from "../../util/format";
 import { MdRemoveCircleOutline, MdAddCircleOutline, MdDelete } from "react-icons/md";
 import { Container, ProductTable, Total } from "./styles";
 
-function Cart({ cart, removeFromCart, updateAmount }) {
+function Cart({ cart, total, removeFromCart, updateAmount }) {
   function increment(product) {
     updateAmount(product.id, product.amount + 1);
   }
@@ -56,7 +57,7 @@ function Cart({ cart, removeFromCart, updateAmount }) {
                 </div>
               </td>
               <td>
-                <strong>{product.formattedPrice}</strong>
+                <strong>{product.subtotal}</strong>
               </td>
               <td>
                 <button
@@ -76,7 +77,7 @@ function Cart({ cart, removeFromCart, updateAmount }) {
         </button>
         <Total>
           <span>TOTAL</span>
-          <strong>$ 10.90</strong>
+          <strong>{total}</strong>
         </Total>
       </footer>
     </Container>
@@ -84,7 +85,13 @@ function Cart({ cart, removeFromCart, updateAmount }) {
 }
 
 const mapStateToProps = state => ({
-  cart: state.cart
+  cart: state.cart.map(product => ({
+    ...product,
+    subtotal: formatPrice(product.price * product.amount)
+  })),
+  total: formatPrice(state.cart.reduce((total, product) => {
+    return total + product.price * product.amount
+  }, 0))
 })
 
 const mapDispatchToProps = dispatch => (
