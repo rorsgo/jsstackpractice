@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import * as Yup from "yup";
 
 import User from "../models/User";
+import File from "../models/File";
 
 class SessionController {
   async store(request, response) {
@@ -10,24 +11,34 @@ class SessionController {
       password: Yup.string().required()
     });
 
-    if(!(await schema.isValid(request.body))){
+    if (!(await schema.isValid(request.body))) {
       return response.status(400).json({ error: "Fields not valid" });
     }
-    
+
     const { email, password } = request.body;
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({
+      where: { email },
+      include: [
+        {
+          model: File,
+          as: "avatar",
+          attributes: ["id", "path", "url"],
+        }
+      ]
+    });
 
     if (!user && !(await user.checkPassword(password))) {
       return response.status(401).json({ error: "You've entered with an email or password incorrect." })
     }
 
-    const { id, name } = user;
+    const { id, name, avatar } = user;
 
     return response.json({
       user: {
         id,
         name,
         email,
+        avatar
       },
       token: jwt.sign(
         {
