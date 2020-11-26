@@ -27,11 +27,17 @@ export const Content = styled.div`
         height: 40px;
         padding: 0 15px;
         color: #FFF;
-        margin: 0 0 30px;
+        margin: 0 0 10px;
 
         &::placeholder {
         color: rgba(255, 255, 255, 0.7);
         }
+    }
+
+    span {
+        align-self: flex-start;
+        padding: 0 0 10px 10px;
+        color: #FF0000DF
     }
 
     button {
