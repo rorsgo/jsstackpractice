@@ -46,6 +46,7 @@ export const Content = styled.div`
         border-radius: 10px;
         font-weight: bold;
         font-size: 16px;
+        margin-top: 10px;
         background: rgba(255, 255, 255, 0.8);
         transition: background 0.2s;
 
