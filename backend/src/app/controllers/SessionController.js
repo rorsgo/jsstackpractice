@@ -31,13 +31,14 @@ class SessionController {
       return response.status(401).json({ error: "You've entered with an email or password incorrect." })
     }
 
-    const { id, name, avatar } = user;
+    const { id, name, avatar, provider } = user;
 
     return response.json({
       user: {
         id,
         name,
         email,
+        provider,
         avatar
       },
       token: jwt.sign(
