@@ -10,12 +10,12 @@ import store from "./store";
 
 const App = () => {
   return (
-    <Provider store={store}>
-      <Router history={history}>
+    <Router history={history}>
+      <Provider store={store}>
         <GlobalStyles />
         <Route />
-      </Router>
-    </Provider>
+      </Provider>
+    </Router>
   );
 }
 
